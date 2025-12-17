@@ -1,0 +1,124 @@
+# Playfair Cipher Implementation
+
+A Python implementation of the Playfair cipher with encryption, decryption, and test cases.
+
+## Features
+
+- Playfair table generation from any key
+- Text preprocessing with special case handling
+- Encryption and decryption
+- Visual table display
+- Interactive menu system
+- 6 test cases included
+
+## Usage
+
+Requires Python 3.6+. Run the program:
+
+```bash
+python playfair_cipher_Version2.py
+```
+
+Menu options:
+1. Encrypt a message
+2. Decrypt a message
+3. Run test cases
+4. Exit
+
+## Algorithm Overview
+
+### Playfair Table Generation
+
+The algorithm creates a 5×5 grid from a keyword: 
+
+**Example with key "PLAYFAIR":**
+```
+P L A Y F
+I R E X M
+B C D G H
+K N O Q S
+T U V W Z
+```
+
+Steps:
+1. Convert key to uppercase
+2. Replace J with I
+3. Remove duplicates
+4. Add remaining alphabet (without J)
+5. Fill 5×5 grid row by row
+
+### Text Preprocessing
+
+Messages are converted into digraphs (pairs of letters):
+
+Rules:
+- Convert to uppercase
+- Remove non-alphabetic characters
+- Replace J with I
+- Split into pairs
+
+Special Cases: 
+
+| Input | Preprocessing | Digraphs | Reason |
+|-------|---------------|----------|--------|
+| `HELLO` | HE LX LO | `HE \| LX \| LO` | Insert X between double L |
+| `ABX` | AB XZ | `AB \| XZ` | Use Z for X padding |
+| `X` | XZ | `XZ` | Single X gets Z padding |
+| `CAT` | CA TX | `CA \| TX` | Odd length gets X padding |
+
+### Encryption Rules
+
+For each digraph, locate both letters in the table:
+
+#### Rule 1: Same Row - Shift right (circular)
+```
+Example: "AR" in table
+P [L] [A] Y F     →    A becomes L (right of A)
+                        R becomes E (right of R, wrap)
+AR → LE
+```
+
+#### Rule 2: Same Column - Shift down (circular)
+```
+Example: "PI"
+[P]               →    P becomes B (below P)
+I                      I becomes K (below I)
+[B]
+K
+PI → BK
+```
+
+#### Rule 3: Rectangle - Swap columns
+```
+Example: "HE"
+P L [A] Y [F]     →    H at (0,4) goes to column 2 = A
+I R [E] X M            E at (1,2) goes to column 4 = M
+
+HE → AM
+```
+
+### Decryption Rules
+
+Reverse of encryption:
+- Same row: Shift left
+- Same column: Shift up
+- Rectangle: Same (swap columns)
+
+## Test Cases
+
+1. **Standard Message**: HIDETHEGOLDINTHETREESTUMP → EBIMQMGHVRIRONKGODKUKNNZEF
+2. **Message Ending in X**: ABX → AB | XZ
+3. **Single X**: X → XZ
+4. **Double Letters**: HELLO → HE | LX | LO
+
+5. **ARLATHAN Example**: Complete encryption/decryption test
+6. **Decryption Verification**: Confirms decryption returns original text
+
+
+
+## Key Implementation Notes
+
+- J and I are treated as the same letter (5×5 grid)
+- Duplicate letters are separated with X (or Z if the letter is X)
+- Odd-length messages are padded with X
+- Circular shifts use modulo operation for wrapping
